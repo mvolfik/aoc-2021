@@ -2,28 +2,24 @@ use std::collections::{HashMap, HashSet};
 use std::str::Lines;
 
 pub(crate) fn main(
-    mut stdin: Lines,
+    stdin: Lines,
 ) -> Result<(Result<String, String>, Result<String, String>), String> {
     let mut connections: HashMap<String, HashSet<String>> = HashMap::new();
-    loop {
-        let line = match stdin.next() {
-            None => break,
-            Some(x) => x,
-        };
+    for line in stdin {
         let mut iterator = line.split("-");
         let (a, b) = match (iterator.next(), iterator.next()) {
             (Some(a), Some(b)) => (a, b),
-            _ => return Err(String::from("Unexpected input format")),
+            _ => return Err("Unexpected input format".to_string()),
         };
 
         connections
-            .entry(String::from(a))
+            .entry(a.to_string())
             .or_insert_with(|| HashSet::new())
-            .insert(String::from(b));
+            .insert(b.to_string());
         connections
-            .entry(String::from(b))
+            .entry(b.to_string())
             .or_insert_with(|| HashSet::new())
-            .insert(String::from(a));
+            .insert(a.to_string());
     }
 
     let part1 = search(&connections, &vec!["start"], false, false).map(|x| x.to_string());
@@ -72,7 +68,7 @@ fn search(
                 }
                 true
             } else {
-                match find_at_least(&path, &next.as_str(), if is_part_2 {2} else {1}) {
+                match find_at_least(&path, &next.as_str(), if is_part_2 { 2 } else { 1 }) {
                     0 => false,
                     1 => {
                         if is_part_2 {
