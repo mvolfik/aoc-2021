@@ -4,7 +4,7 @@ use std::str::Lines;
 fn parseline(l: &str) -> Result<(&str, i32), String> {
     let mut iterator = l.split(" ");
     match (iterator.next(), iterator.next()) {
-        (Some(a), Some(b)) => Ok((a, i32::from_str(b).map_err(|e| format!("{}", e))?)),
+        (Some(a), Some(b)) => Ok((a, i32::from_str(b).map_err(|e| e.to_string())?)),
         _ => Err("Unexpected line format".to_string()),
     }
 }

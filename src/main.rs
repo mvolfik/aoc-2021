@@ -1,5 +1,6 @@
 mod day1;
 mod day2;
+mod day6;
 mod day12;
 
 fn main() {
@@ -9,7 +10,7 @@ fn main() {
         None,
         None,
         None, // 5
-        None,
+        Some(crate::day6::main),
         None,
         None,
         None,
