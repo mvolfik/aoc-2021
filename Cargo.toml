@@ -1,0 +1,5 @@
+[package]
+name = "aoc_2021"
+version = "0.1.0"
+authors = ["Matěj Volf <mat.volfik@gmail.com>"]
+edition = "2018"
