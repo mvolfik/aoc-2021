@@ -1,7 +1,8 @@
 mod day1;
+mod day12;
+mod day15;
 mod day2;
 mod day6;
-mod day12;
 
 fn main() {
     let days: Vec<Option<for<'r> fn(std::str::Lines<'r>) -> Result<_, _>>> = vec![
@@ -19,7 +20,7 @@ fn main() {
         Some(crate::day12::main),
         None,
         None,
-        None, // 15
+        Some(crate::day15::main), // 15
         None,
         None,
         None,

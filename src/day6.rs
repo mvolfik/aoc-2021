@@ -5,9 +5,13 @@ use std::str::Lines;
 pub(crate) fn main(
     mut stdin: Lines,
 ) -> Result<(Result<String, String>, Result<String, String>), String> {
-    let mut deq: VecDeque<u64> = VecDeque::from([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    let mut deq: VecDeque<u64> = VecDeque::from([0; 9]);
     for n in stdin.next().ok_or("Missing input")?.split(",") {
-        deq[usize::from_str(n).map_err(|x| x.to_string())?] += 1
+        let i = usize::from_str(n).map_err(|x| x.to_string())?;
+        if i > 8 {
+            return Err(format!("Unexpected number: {}", i));
+        }
+        deq[i] += 1
     }
     const N1: i32 = 80;
     for _ in 0..N1 {
