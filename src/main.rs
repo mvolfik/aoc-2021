@@ -3,9 +3,11 @@ mod day12;
 mod day15;
 mod day2;
 mod day6;
+mod utils;
 
 fn main() {
-    let days: Vec<Option<for<'r> fn(std::str::Lines<'r>) -> Result<_, _>>> = vec![
+    use crate::utils::DayResult;
+    let days: Vec<Option<for<'r> fn(std::str::Lines<'r>) -> DayResult>> = vec![
         Some(crate::day1::main),
         Some(crate::day2::main),
         None,

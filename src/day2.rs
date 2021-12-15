@@ -1,22 +1,24 @@
-use std::str::FromStr;
-use std::str::Lines;
+use {
+    crate::utils::{DayResult, Failable},
+    std::str::{FromStr, Lines},
+};
 
-fn parseline(l: &str) -> Result<(&str, i32), String> {
-    let mut iterator = l.split(" ");
+fn parseline(l: &str) -> Failable<(&str, i32)> {
+    let mut iterator = l.split(' ');
     match (iterator.next(), iterator.next()) {
         (Some(a), Some(b)) => Ok((a, i32::from_str(b).map_err(|e| e.to_string())?)),
         _ => Err("Unexpected line format".to_string()),
     }
 }
-pub(crate) fn main(
-    stdin: Lines,
-) -> Result<(Result<String, String>, Result<String, String>), String> {
-    let commands: Vec<(&str, i32)> = stdin.map(parseline).collect::<Result<Vec<_>, _>>()?;
+pub(crate) fn main(stdin: Lines) -> DayResult {
+    let commands: Vec<(&str, i32)> = stdin
+        .map(parseline)
+        .collect::<Failable<Vec<(&str, i32)>>>()?;
 
     Ok((Ok(run_part1(&commands)), Ok(run_part2(&commands))))
 }
 
-fn run_part1(commands: &Vec<(&str, i32)>) -> String {
+fn run_part1(commands: &[(&str, i32)]) -> String {
     let (mut x, mut d) = (0, 0);
     for (c, n) in commands {
         if *c == "up" {
@@ -29,7 +31,7 @@ fn run_part1(commands: &Vec<(&str, i32)>) -> String {
     }
     (x * d).to_string()
 }
-fn run_part2(commands: &Vec<(&str, i32)>) -> String {
+fn run_part2(commands: &[(&str, i32)]) -> String {
     let (mut x, mut d, mut aim) = (0, 0, 0);
     for (c, n) in commands {
         if *c == "up" {

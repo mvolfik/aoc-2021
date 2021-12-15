@@ -1,13 +1,13 @@
-use std::str::FromStr;
-use std::str::Lines;
+use {
+    crate::utils::DayResult,
+    std::str::{FromStr, Lines},
+};
 
-pub(crate) fn main(
-    stdin: Lines,
-) -> Result<(Result<String, String>, Result<String, String>), String> {
+pub(crate) fn main(stdin: Lines) -> DayResult {
     let numbers: Vec<i32> = stdin
-        .map(|l| i32::from_str(l))
+        .map(i32::from_str)
         .collect::<Result<Vec<i32>, _>>()
-        .or(Err("Hello"))?;
+        .map_err(|e| format!("Expected to parse number: {}", e))?;
     let mut n1 = 0;
     for i in 1..numbers.len() {
         if numbers[i] > numbers[i - 1] {

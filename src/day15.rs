@@ -1,11 +1,11 @@
-use std::cmp::Ordering;
-use std::str::Lines;
+use {
+    crate::utils::{DayResult, Failable},
+    std::{cmp::Ordering, str::Lines},
+};
 
 type Position = (i32, i32);
 
-pub(crate) fn main(
-    stdin: Lines,
-) -> Result<(Result<String, String>, Result<String, String>), String> {
+pub(crate) fn main(stdin: Lines) -> DayResult {
     let mut grid = WrappedGrid::new(stdin, (1, 1))?;
     let pt1 = search(&grid).map(|x| x.to_string());
     //Option::<()>::None.unwrap();
@@ -26,7 +26,7 @@ impl WrappedGrid {
         }
         let (mx, x) = ((x / self.wrap_border.0) as u32, x % self.wrap_border.0);
         let (my, y) = ((y / self.wrap_border.1) as u32, y % self.wrap_border.1);
-        return Some((self.data[y as usize][x as usize] - 1 + mx + my) % 9 + 1);
+        Some((self.data[y as usize][x as usize] - 1 + mx + my) % 9 + 1)
     }
     fn set_repeat(&mut self, repeat: Position) {
         self.border = (
@@ -34,7 +34,7 @@ impl WrappedGrid {
             self.wrap_border.1 * repeat.1 - 1,
         );
     }
-    fn new(data: Lines, repeat: Position) -> Result<Self, String> {
+    fn new(data: Lines, repeat: Position) -> Failable<Self> {
         let mut grid_data = Vec::new();
         let mut w = None;
         for l in data {
@@ -86,7 +86,7 @@ impl PartialOrd for PathPoint {
     }
 }
 
-fn search(grid: &WrappedGrid) -> Result<u32, String> {
+fn search(grid: &WrappedGrid) -> Failable<u32> {
     let mut q = std::collections::BinaryHeap::new();
     q.push(PathPoint {
         cost: 0,

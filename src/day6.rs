@@ -1,12 +1,14 @@
-use std::collections::VecDeque;
-use std::str::FromStr;
-use std::str::Lines;
+use {
+    crate::utils::DayResult,
+    std::{
+        collections::VecDeque,
+        str::{FromStr, Lines},
+    },
+};
 
-pub(crate) fn main(
-    mut stdin: Lines,
-) -> Result<(Result<String, String>, Result<String, String>), String> {
+pub(crate) fn main(mut stdin: Lines) -> DayResult {
     let mut deq: VecDeque<u64> = VecDeque::from([0; 9]);
-    for n in stdin.next().ok_or("Missing input")?.split(",") {
+    for n in stdin.next().ok_or("Missing input")?.split(',') {
         let i = usize::from_str(n).map_err(|x| x.to_string())?;
         if i > 8 {
             return Err(format!("Unexpected number: {}", i));
