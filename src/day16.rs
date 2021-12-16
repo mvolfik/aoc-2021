@@ -1,4 +1,8 @@
+use crate::utils::Failable;
+use std::ops::{Add, Mul};
 use {crate::utils::DayResult, std::str::Lines};
+
+type Num = u128;
 
 pub(crate) fn main(mut stdin: Lines) -> DayResult {
     let l = match stdin.next() {
@@ -14,15 +18,14 @@ pub(crate) fn main(mut stdin: Lines) -> DayResult {
     }
     let mut reader = BitsReader { bits, pointer: 0 };
     let root = reader.read_packet();
-    // dbg!(&root);
     Ok((
         Ok(sum_versions(&root).to_string()),
-        Err("noyet".to_string()),
+        calc(&root).map(|x| x.to_string()),
     ))
 }
 
-fn sum_versions(packet: &Packet) -> u32 {
-    let mut s = packet.version as u32;
+fn sum_versions(packet: &Packet) -> Num {
+    let mut s = packet.version as Num;
     if let PacketContent::Operator(children) = &packet.content {
         for c in children {
             s += sum_versions(c)
@@ -31,9 +34,49 @@ fn sum_versions(packet: &Packet) -> u32 {
     s
 }
 
+fn calc(packet: &Packet) -> Failable<Num> {
+    match &packet.content {
+        PacketContent::Value(x) => Ok(*x),
+        PacketContent::Operator(children) => {
+            let (mut val, func): (Num, Box<dyn Fn(Num, Num) -> Num>) = match &packet.type_id {
+                0 => (0, Box::new(Num::add)),
+                1 => (1, Box::new(Num::mul)),
+                2 => (Num::MAX, Box::new(Num::min)),
+                3 => (Num::MIN, Box::new(Num::max)),
+                x @ (5 | 6 | 7) => {
+                    let func: Box<dyn for<'r> Fn(&'r Num, &'r Num) -> bool> = match x {
+                        5 => Box::new(Num::gt),
+                        6 => Box::new(Num::lt),
+                        7 => Box::new(Num::eq),
+                        _ => {
+                            panic!("Unreachable branch reached")
+                        }
+                    };
+                    let mut iter = children.iter();
+                    let (a, b) = match (iter.next(), iter.next()) {
+                        (Some(a), Some(b)) => (calc(a)?, calc(b)?),
+                        _ => {
+                            return Err(format!(
+                                "Expected two children for operation packet ver. {}",
+                                x
+                            ))
+                        }
+                    };
+                    return Ok(func(&a, &b) as Num);
+                }
+                x => return Err(format!("Unexpected packet version: {}", x)),
+            };
+            for c in children {
+                val = func(val, calc(c)?)
+            }
+            Ok(val)
+        }
+    }
+}
+
 #[derive(Debug)]
 enum PacketContent {
-    Value(u32),
+    Value(Num),
     Operator(Vec<Packet>),
 }
 
@@ -55,12 +98,12 @@ impl BitsReader {
         self.pointer += 1;
         bit
     }
-    fn read_num(&mut self, bitsize: usize) -> u32 {
-        let mut num = 0;
+    fn read_num(&mut self, bitsize: usize) -> Num {
+        let mut n = 0;
         for _ in 0..bitsize {
-            num = (num << 1) + self.read_bit() as u32;
+            n = (n << 1) + self.read_bit() as Num;
         }
-        num
+        n
     }
     fn read_packet(&mut self) -> Packet {
         let version = self.read_num(3) as u8;
@@ -76,10 +119,11 @@ impl BitsReader {
             }
             PacketContent::Value(val)
         } else {
-            let (mut val, end_fn): (u32, Box<dyn Fn(&Self, u32) -> (u32, bool)>) =
+            let (mut val, end_fn): (Num, Box<dyn Fn(&Self, Num) -> (Num, bool)>) =
                 match self.read_bit() {
                     false => {
-                        let end = self.pointer + self.read_num(15) as usize;
+                        let len = self.read_num(15) as usize;
+                        let end = len + self.pointer;
                         (
                             0,
                             Box::new(move |this_pack, _| (0, this_pack.pointer >= end)),
