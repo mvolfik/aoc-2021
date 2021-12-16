@@ -1,11 +1,16 @@
 mod day1;
 mod day12;
 mod day15;
+mod day16;
 mod day2;
 mod day6;
 mod utils;
 
 fn main() {
+    if std::env::args().len() > 1 {
+        test();
+        return;
+    }
     use crate::utils::DayResult;
     let days: Vec<Option<for<'r> fn(std::str::Lines<'r>) -> DayResult>> = vec![
         Some(crate::day1::main),
@@ -23,7 +28,7 @@ fn main() {
         None,
         None,
         Some(crate::day15::main), // 15
-        None,
+        Some(crate::day16::main),
         None,
         None,
         None,
@@ -72,4 +77,11 @@ fn main() {
             }
         }
     }
+}
+
+fn test() {
+    println!("Input BITS transmission to process: ");
+    let mut s = String::new();
+    std::io::stdin().read_line(&mut s).unwrap();
+    println!("{:?}", day16::main(s.lines(),).unwrap())
 }
