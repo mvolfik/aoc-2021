@@ -58,7 +58,11 @@ fn main() {
                     }
                     Ok(input_data) => {
                         let lines = input_data.lines();
-                        match day_fn(lines) {
+                        let now = std::time::Instant::now();
+                        let res = day_fn(lines);
+                        let duration = now.elapsed();
+                        print!(" (took {:?})", duration);
+                        match res {
                             Err(e) => {
                                 println!(" Exited with error: {}", e)
                             }
