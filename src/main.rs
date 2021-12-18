@@ -1,14 +1,18 @@
+#![deny(clippy::all)]
+#![allow(clippy::type_complexity)]
+
 mod day1;
 mod day12;
 mod day15;
 mod day16;
+mod day18;
 mod day2;
 mod day6;
 mod utils;
 
 fn main() {
-    if std::env::args().len() > 1 {
-        test();
+    if let Some(x) = std::env::args().nth(1) {
+        test(&x);
         return;
     }
     use crate::utils::DayResult;
@@ -30,7 +34,7 @@ fn main() {
         Some(crate::day15::main), // 15
         Some(crate::day16::main),
         None,
-        None,
+        Some(crate::day18::main),
         None,
         None, // 20
         None,
@@ -79,9 +83,7 @@ fn main() {
     }
 }
 
-fn test() {
-    println!("Input BITS transmission to process: ");
-    let mut s = String::new();
-    std::io::stdin().read_line(&mut s).unwrap();
-    println!("{:?}", day16::main(s.lines(),).unwrap())
+fn test(p: &str) {
+    let s = std::fs::read_to_string(std::path::Path::new(&format!("/tmp/{}", p))).unwrap();
+    println!("{:?}", day18::main(s.lines()).unwrap())
 }
