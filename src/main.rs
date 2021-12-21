@@ -7,6 +7,7 @@ mod day15;
 mod day16;
 mod day18;
 mod day2;
+mod day21;
 mod day6;
 mod utils;
 
@@ -37,7 +38,7 @@ fn main() {
         Some(crate::day18::main),
         None,
         None, // 20
-        None,
+        Some(crate::day21::main),
         None,
         None,
         None,
@@ -87,7 +88,8 @@ fn main() {
     }
 }
 
-fn test(p: &str) {
-    let s = std::fs::read_to_string(std::path::Path::new(&format!("/tmp/{}", p))).unwrap();
-    println!("{:?}", day18::main(s.lines()).unwrap())
+fn test(_p: &str) {
+    //let s = std::fs::read_to_string(std::path::Path::new(&format!("/tmp/{}", p))).unwrap();
+    let s = "Player 1 starting position: 4\nPlayer 2 starting position: 8";
+    println!("{:?}", day21::main(s.lines()).unwrap())
 }
